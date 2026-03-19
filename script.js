@@ -1,291 +1,138 @@
-// Global variables
-let tasks = [];
-let currentFilter = 'all';
+// Simple array to store todos
+let todos = [];
 
-// Load tasks from local storage when page loads
+// Load from localStorage when page starts
 document.addEventListener('DOMContentLoaded', () => {
-    loadFromLocalStorage();
-    updateStats();
-    filterTasks('all');
+    const saved = localStorage.getItem('darkTodos');
+    if (saved) {
+        todos = JSON.parse(saved);
+        renderTodos();
+    }
 });
 
-// Add new task
-function addTask() {
-    const taskInput = document.getElementById('taskInput');
-    const prioritySelect = document.getElementById('prioritySelect');
+// Add new todo
+function addTodo() {
+    const input = document.getElementById('todoInput');
+    const text = input.value.trim();
     
-    const taskText = taskInput.value.trim();
-    const priority = prioritySelect.value;
-    
-    if (taskText === '') {
+    if (text === '') {
         alert('Please enter a task!');
         return;
     }
     
-    const task = {
+    const todo = {
         id: Date.now(),
-        text: taskText,
-        priority: priority,
-        completed: false,
-        createdAt: new Date().toLocaleString()
+        text: text,
+        completed: false
     };
     
-    tasks.push(task);
-    taskInput.value = '';
+    todos.push(todo);
+    input.value = '';
     
-    // Save to local storage
-    saveToLocalStorage();
-    
-    // Refresh display
-    filterTasks(currentFilter);
-    updateStats();
-    
-    // Show success message
-    showNotification('Task added successfully!', 'success');
+    saveAndRender();
 }
 
-// Delete task
-function deleteTask(id) {
-    if (confirm('Are you sure you want to delete this task?')) {
-        tasks = tasks.filter(task => task.id !== id);
-        saveToLocalStorage();
-        filterTasks(currentFilter);
-        updateStats();
-        showNotification('Task deleted successfully!', 'success');
+// Toggle complete status
+function toggleTodo(id) {
+    const todo = todos.find(t => t.id === id);
+    if (todo) {
+        todo.completed = !todo.completed;
+        saveAndRender();
     }
 }
 
-// Edit task
-function editTask(id) {
-    const task = tasks.find(t => t.id === id);
-    const newText = prompt('Edit task:', task.text);
-    
-    if (newText !== null && newText.trim() !== '') {
-        task.text = newText.trim();
-        saveToLocalStorage();
-        filterTasks(currentFilter);
-        showNotification('Task updated successfully!', 'success');
+// Delete single todo
+function deleteTodo(id) {
+    if (confirm('Delete this task?')) {
+        todos = todos.filter(t => t.id !== id);
+        saveAndRender();
     }
 }
 
-// Toggle task completion
-function toggleComplete(id) {
-    const task = tasks.find(t => t.id === id);
-    task.completed = !task.completed;
-    saveToLocalStorage();
-    filterTasks(currentFilter);
-    updateStats();
-}
-
-// Filter tasks
-function filterTasks(filter) {
-    currentFilter = filter;
+// Edit todo
+function editTodo(id) {
+    const todo = todos.find(t => t.id === id);
+    const newText = prompt('Edit task:', todo.text);
     
-    // Update active filter button
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    event.target.classList.add('active');
-    
-    let filteredTasks = [];
-    
-    if (filter === 'all') {
-        filteredTasks = tasks;
-    } else if (filter === 'completed') {
-        filteredTasks = tasks.filter(task => task.completed);
-    } else if (filter === 'pending') {
-        filteredTasks = tasks.filter(task => !task.completed);
+    if (newText && newText.trim() !== '') {
+        todo.text = newText.trim();
+        saveAndRender();
     }
-    
-    displayTasks(filteredTasks);
 }
 
-// Display tasks in UI
-function displayTasks(tasksToDisplay) {
-    const taskList = document.getElementById('taskList');
-    const emptyState = document.getElementById('emptyState');
+// Clear completed todos
+function clearCompleted() {
+    const completedCount = todos.filter(t => t.completed).length;
     
-    if (tasksToDisplay.length === 0) {
-        taskList.innerHTML = '';
-        emptyState.style.display = 'block';
+    if (completedCount === 0) {
+        alert('No completed tasks!');
         return;
     }
     
-    emptyState.style.display = 'none';
+    if (confirm(`Delete ${completedCount} completed task(s)?`)) {
+        todos = todos.filter(t => !t.completed);
+        saveAndRender();
+    }
+}
+
+// Update statistics
+function updateStats() {
+    const total = todos.length;
+    const completed = todos.filter(t => t.completed).length;
+    const pending = total - completed;
     
-    // Sort tasks: high priority first, then medium, then low
-    const priorityOrder = { 'high': 1, 'medium': 2, 'low': 3 };
-    const sortedTasks = tasksToDisplay.sort((a, b) => {
-        return priorityOrder[a.priority] - priorityOrder[b.priority];
-    });
+    document.getElementById('totalCount').textContent = total;
+    document.getElementById('doneCount').textContent = completed;
+    document.getElementById('leftCount').textContent = pending;
+}
+
+// Render todos to screen
+function renderTodos() {
+    const list = document.getElementById('todoList');
     
-    taskList.innerHTML = sortedTasks.map(task => `
-        <li class="task-item ${task.completed ? 'completed' : ''}">
-            <input type="checkbox" class="task-checkbox" 
-                ${task.completed ? 'checked' : ''} 
-                onchange="toggleComplete(${task.id})">
-            
-            <div class="task-content">
-                <div class="task-text">${task.text}</div>
-                <div class="task-meta">
-                    <span class="priority-badge priority-${task.priority}">
-                        ${task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
-                    </span>
-                    <span class="created-at">
-                        <i class="far fa-clock"></i> ${task.createdAt}
-                    </span>
-                </div>
+    if (todos.length === 0) {
+        list.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-clipboard"></i>
+                <p>No tasks yet. Add one above!</p>
             </div>
-            
-            <div class="task-actions">
-                <button class="edit-btn" onclick="editTask(${task.id})">
+        `;
+        updateStats();
+        return;
+    }
+    
+    list.innerHTML = todos.map(todo => `
+        <li class="todo-item ${todo.completed ? 'completed' : ''}">
+            <input 
+                type="checkbox" 
+                class="todo-checkbox" 
+                ${todo.completed ? 'checked' : ''}
+                onclick="toggleTodo(${todo.id})"
+            >
+            <span class="todo-text">${todo.text}</span>
+            <div class="todo-actions">
+                <button onclick="editTodo(${todo.id})" title="Edit">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="delete-btn" onclick="deleteTask(${task.id})">
+                <button onclick="deleteTodo(${todo.id})" class="delete-btn" title="Delete">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
         </li>
     `).join('');
-}
-
-// Update statistics
-function updateStats() {
-    const totalTasks = tasks.length;
-    const completedTasks = tasks.filter(task => task.completed).length;
-    const pendingTasks = totalTasks - completedTasks;
     
-    document.getElementById('totalTasks').textContent = totalTasks;
-    document.getElementById('completedTasks').textContent = completedTasks;
-    document.getElementById('pendingTasks').textContent = pendingTasks;
+    updateStats();
 }
 
-// Save to local storage
-function saveToLocalStorage() {
-    localStorage.setItem('todoTasks', JSON.stringify(tasks));
-    showNotification('Tasks saved to local storage!', 'success');
+// Save to localStorage and render
+function saveAndRender() {
+    localStorage.setItem('darkTodos', JSON.stringify(todos));
+    renderTodos();
 }
 
-// Load from local storage
-function loadFromLocalStorage() {
-    const savedTasks = localStorage.getItem('todoTasks');
-    if (savedTasks) {
-        tasks = JSON.parse(savedTasks);
-        showNotification('Tasks loaded from local storage!', 'info');
-    } else {
-        // Add some sample tasks for first-time users
-        tasks = [
-            {
-                id: 1,
-                text: 'Welcome to your To-Do App!',
-                priority: 'high',
-                completed: false,
-                createdAt: new Date().toLocaleString()
-            },
-            {
-                id: 2,
-                text: 'Try adding a new task',
-                priority: 'medium',
-                completed: false,
-                createdAt: new Date().toLocaleString()
-            },
-            {
-                id: 3,
-                text: 'Mark this as completed',
-                priority: 'low',
-                completed: true,
-                createdAt: new Date().toLocaleString()
-            }
-        ];
-    }
-}
-
-// Delete all tasks
-function deleteAllTasks() {
-    if (tasks.length === 0) {
-        alert('No tasks to delete!');
-        return;
-    }
-    
-    if (confirm('Are you sure you want to delete ALL tasks? This cannot be undone!')) {
-        tasks = [];
-        saveToLocalStorage();
-        filterTasks(currentFilter);
-        updateStats();
-        showNotification('All tasks deleted!', 'warning');
-    }
-}
-
-// Save tasks (explicit save button)
-function saveTasks() {
-    saveToLocalStorage();
-}
-
-// Show notification
-function showNotification(message, type) {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-info-circle'}"></i>
-        ${message}
-    `;
-    
-    // Style the notification
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${type === 'success' ? '#28a745' : '#17a2b8'};
-        color: white;
-        padding: 15px 25px;
-        border-radius: 8px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-        z-index: 1000;
-        animation: slideInRight 0.3s ease;
-    `;
-    
-    document.body.appendChild(notification);
-    
-    // Remove notification after 3 seconds
-    setTimeout(() => {
-        notification.style.animation = 'slideOutRight 0.3s ease';
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
-}
-
-// Add keyboard shortcut (Enter key to add task)
-document.getElementById('taskInput').addEventListener('keypress', (e) => {
+// Add todo with Enter key
+document.getElementById('todoInput').addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
-        addTask();
+        addTodo();
     }
 });
-
-// Add some CSS animations for notifications
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideInRight {
-        from {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOutRight {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(100%);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
