@@ -6,7 +6,7 @@
 }
 
 body {
-    background: #0a0c0f;
+    background: #e8ecf2;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -17,15 +17,14 @@ body {
 .container {
     max-width: 500px;
     width: 100%;
-    background: #1a1e24;
+    background: #ffffff;
     border-radius: 20px;
     padding: 2rem;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    border: 1px solid #2a2f38;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-    color: #00ff88;
+    color: #2c3e50;
     font-size: 2rem;
     margin-bottom: 1.5rem;
     display: flex;
@@ -34,7 +33,7 @@ h1 {
 }
 
 h1 i {
-    color: #ffaa00;
+    color: #3498db;
 }
 
 .input-group {
@@ -46,58 +45,58 @@ h1 i {
 .input-group input {
     flex: 1;
     padding: 12px 16px;
-    background: #252b34;
-    border: 1px solid #3a424e;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
     border-radius: 12px;
-    color: white;
+    color: #1e293b;
     font-size: 1rem;
     transition: all 0.3s;
 }
 
 .input-group input:focus {
     outline: none;
-    border-color: #00ff88;
-    background: #2a313c;
+    border-color: #3498db;
+    background: #ffffff;
 }
 
 .input-group input::placeholder {
-    color: #6b7a8f;
+    color: #94a3b8;
 }
 
 .input-group button {
     width: 48px;
     height: 48px;
-    background: #00ff88;
+    background: #3498db;
     border: none;
     border-radius: 12px;
-    color: #1a1e24;
+    color: white;
     font-size: 1.2rem;
     cursor: pointer;
     transition: all 0.3s;
 }
 
 .input-group button:hover {
-    background: #00cc6a;
+    background: #2980b9;
     transform: scale(0.95);
 }
 
 .stats {
     display: flex;
     justify-content: space-around;
-    background: #252b34;
+    background: #f8fafc;
     padding: 1rem;
     border-radius: 12px;
     margin-bottom: 1.5rem;
-    border: 1px solid #3a424e;
+    border: 1px solid #e2e8f0;
 }
 
 .stats div {
-    color: #8b9bb5;
+    color: #64748b;
     font-size: 0.95rem;
 }
 
 .stats span {
-    color: #00ff88;
+    color: #3498db;
     font-weight: bold;
     font-size: 1.2rem;
     margin-left: 5px;
@@ -111,8 +110,8 @@ h1 i {
 }
 
 .todo-item {
-    background: #252b34;
-    border: 1px solid #3a424e;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
     border-radius: 10px;
     padding: 12px 16px;
     margin-bottom: 8px;
@@ -134,25 +133,25 @@ h1 i {
 }
 
 .todo-item.completed {
-    opacity: 0.6;
-    border-color: #00ff88;
+    background: #f1f5f9;
+    border-color: #cbd5e1;
 }
 
 .todo-item.completed .todo-text {
     text-decoration: line-through;
-    color: #6b7a8f;
+    color: #94a3b8;
 }
 
 .todo-checkbox {
     width: 22px;
     height: 22px;
     cursor: pointer;
-    accent-color: #00ff88;
+    accent-color: #3498db;
 }
 
 .todo-text {
     flex: 1;
-    color: white;
+    color: #1e293b;
     font-size: 1rem;
     word-break: break-word;
 }
@@ -165,7 +164,7 @@ h1 i {
 .todo-actions button {
     background: none;
     border: none;
-    color: #8b9bb5;
+    color: #64748b;
     cursor: pointer;
     font-size: 1rem;
     padding: 5px;
@@ -174,24 +173,24 @@ h1 i {
 }
 
 .todo-actions button:hover {
-    color: #00ff88;
-    background: #2a313c;
+    color: #3498db;
+    background: #e2e8f0;
 }
 
 .todo-actions .delete-btn:hover {
-    color: #ff4444;
+    color: #ef4444;
 }
 
 .empty-state {
     text-align: center;
-    color: #4a5568;
+    color: #94a3b8;
     padding: 2rem;
 }
 
 .empty-state i {
     font-size: 3rem;
     margin-bottom: 1rem;
-    color: #2d3748;
+    color: #cbd5e1;
 }
 
 .footer {
@@ -199,9 +198,9 @@ h1 i {
 }
 
 .clear-btn {
-    background: #2d3748;
-    color: #ff6b6b;
-    border: 1px solid #4a5568;
+    background: #f1f5f9;
+    color: #ef4444;
+    border: 1px solid #e2e8f0;
     padding: 10px 20px;
     border-radius: 10px;
     cursor: pointer;
@@ -210,25 +209,24 @@ h1 i {
 }
 
 .clear-btn:hover {
-    background: #ff4444;
+    background: #ef4444;
     color: white;
-    border-color: #ff4444;
+    border-color: #ef4444;
 }
 
-/* Scrollbar styling */
 #todoList::-webkit-scrollbar {
     width: 6px;
 }
 
 #todoList::-webkit-scrollbar-track {
-    background: #1a1e24;
+    background: #f1f5f9;
 }
 
 #todoList::-webkit-scrollbar-thumb {
-    background: #3a424e;
+    background: #cbd5e1;
     border-radius: 3px;
 }
 
 #todoList::-webkit-scrollbar-thumb:hover {
-    background: #4a5568;
+    background: #94a3b8;
 }
