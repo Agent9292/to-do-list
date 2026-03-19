@@ -3,14 +3,14 @@ let todos = [];
 
 // Load from localStorage when page starts
 document.addEventListener('DOMContentLoaded', function() {
-    const saved = localStorage.getItem('darkTodos');
+    const saved = localStorage.getItem('todos');
     if (saved) {
         todos = JSON.parse(saved);
         renderTodos();
     } else {
         // Add sample todos for first time
         todos = [
-            { id: 1, text: 'Welcome to Dark Todo!', completed: false },
+            { id: 1, text: 'Welcome to Todo App!', completed: false },
             { id: 2, text: 'Click checkbox to complete', completed: false },
             { id: 3, text: 'Try editing this task', completed: true }
         ];
@@ -77,7 +77,7 @@ function editTodo(id) {
 
 // Clear completed todos
 function clearCompleted() {
-    const completedCount = 0;
+    let completedCount = 0;
     for(let i = 0; i < todos.length; i++) {
         if(todos[i].completed) {
             completedCount++;
@@ -164,7 +164,7 @@ function renderTodos() {
 
 // Save to localStorage and render
 function saveAndRender() {
-    localStorage.setItem('darkTodos', JSON.stringify(todos));
+    localStorage.setItem('todos', JSON.stringify(todos));
     renderTodos();
 }
 
